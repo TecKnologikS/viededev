@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://viede.dev/sitemap-index.xml
