@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Claude Ship : l&#39;activer et s&#39;en servir – Vie de Dev</title><meta name="description" content="Claude Ship relit tes pull requests, les répare et peut les approuver. Comment l'essayer avec /ship, l'activer pour une équipe, et les pièges à éviter."><link rel="canonical" href="https://viede.dev/journal/claude-ship/"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#F5F2EA" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#13120E" media="(prefers-color-scheme: dark)"><meta property="og:title" content="Claude Ship : l'activer et s'en servir – Vie de Dev"><meta property="og:description" content="Claude Ship relit tes pull requests, les répare et peut les approuver. Comment l'essayer avec /ship, l'activer pour une équipe, et les pièges à éviter."><meta property="og:url" content="https://viede.dev/journal/claude-ship/"><meta property="og:type" content="article"><meta property="og:site_name" content="Vie de Dev"><meta property="og:locale" content="fr_FR"><meta property="article:published_time" content="2026-11-24T00:00:00.000Z"><meta property="og:image" content="https://viede.dev/og/claude-ship.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Image de partage : Claude Ship : l'activer et s'en servir"><meta name="twitter:card" content="summary_large_image"><link rel="alternate" type="application/rss+xml" title="Vie de Dev" href="/rss.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/_astro/Base.xOoV3n0S.css"></head><body><a class="skip" href="#contenu">Aller au contenu</a><div class="site"><header class="nav"><a class="logo" href="/" aria-label="vie de dev, accueil">vie de dev<span class="cur" aria-hidden="true"></span></a><nav aria-label="Navigation principale"><ul><li><a href="/journal/" aria-current="page">journal</a></li><li><a href="/apps/">apps</a></li><li><a href="/a-propos/">à propos</a></li></ul></nav></header><main id="contenu"><article class="page"><nav class="crumbs" aria-label="Fil d'ariane"><a href="/journal/">journal</a> / ia / claude-code / github</nav><h1>Claude Ship : l&#39;activer et s&#39;en servir</h1><p class="meta"><span class="hash">bfe80d1</span><time datetime="2026-11-24">24 nov. 2026</time><span>7 min de lecture</span><span>#ia #claude-code #github</span></p><div class="prose"><p>Anthropic a sorti Claude Ship le 23/11/2026, en bêta. Claude relit tes pull requests, pousse les corrections, et peut les approuver si les règles de ton équipe le permettent.</p>
+<p><strong>D’où vient ce guide.</strong> Il suit la documentation officielle, lue en entier le 24/11/2026. Je n’ai pas pu activer les agents moi-même : mes dépôts sont sur Forgejo, et Claude Ship ne marche qu’avec GitHub. Les noms de menus sont ceux de la doc, en anglais. Le produit est en bêta, ils peuvent bouger.</p>
+<h2 id="ce-que-cest">Ce que c’est</h2>
+<p>Une commande et trois agents.</p>
+<ul>
+<li><strong><code>/ship</code></strong>, dans Claude Code : elle ouvre ta pull request, la relit et la répare, depuis ton terminal.</li>
+<li><strong>Code Review</strong> : relit chaque pull request et laisse des commentaires classés par gravité. Disponible pour tous.</li>
+<li><strong>PR Steward</strong> (bêta) : répare la CI en échec, les conflits de merge et les retours de review. Il n’approuve pas et ne merge pas.</li>
+<li><strong>Claude Approvals</strong> (bêta) : applique un fichier de règles écrit par l’équipe. Selon ces règles, Claude approuve ou demande un humain.</li>
+</ul>
+<h2 id="pour-qui">Pour qui</h2>
+<ul>
+<li>Les agents demandent une offre <strong>Claude Team ou Enterprise</strong>.</li>
+<li>Les dépôts doivent être sur <strong>GitHub</strong>.</li>
+<li>Exclus : les organisations en Zero Data Retention, en configuration HIPAA, ou avec leurs propres clés de chiffrement.</li>
+</ul>
+<p>Pour <code>/ship</code> seule, la doc ne dit pas si une offre Pro ou Max suffit. Elle dit seulement que la commande tourne dans ta session et compte dans ton usage.</p>
+<h2 id="lessayer-seul--ship">L’essayer seul : <code>/ship</code></h2>
+<p>C’est le plus court chemin : rien à activer côté admin.</p>
+<p>Il te faut :</p>
+<ul>
+<li>Claude Code <strong>2.1.330</strong> ou plus récent ;</li>
+<li>GitHub CLI <strong>2.63</strong> ou plus récent, connecté avec <code>gh auth login</code> ;</li>
+<li>git <strong>2.38</strong> ou plus récent.</li>
+</ul>
+<p>Depuis le clone local de ton dépôt, dans Claude Code :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>/ship</span></span></code></pre>
+<p>Ce qui se passe, dans l’ordre :</p>
+<ol>
+<li><strong>Pull request</strong> : Claude commit ton travail, pousse la branche et ouvre la pull request à ton nom. Si tu es sur la branche par défaut, il crée une nouvelle branche et bascule dessus.</li>
+<li><strong>Review</strong> : il lance <code>/code-review</code> sur ton changement.</li>
+<li><strong>Surveillance</strong> : il continue de regarder la pull request et pousse des corrections pour la CI en échec, les conflits et les commentaires.</li>
+<li><strong>Merge</strong> : c’est toi qui merges.</li>
+</ol>
+<p>Trois choses à savoir avant de la lancer :</p>
+<ul>
+<li><strong>Pas de confirmation.</strong> Avant le commit et avant le push, une ligne finit par « Esc to cancel ». Si tu ne fais rien, ça continue au bout de quelques secondes.</li>
+<li><strong>Pour arrêter</strong> : <code>/ship stop</code> dans la session qui la fait tourner.</li>
+<li><strong>Annulé après le commit ?</strong> <code>git reset HEAD~1</code> défait le commit en gardant tes fichiers.</li>
+</ul>
+<p>Quelques arguments utiles :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>/ship low          # review plus légère (low, medium, high, xhigh, max ; high par défaut)</span></span>
+<span class="line"><span>/ship 41           # travaille sur la pull request 41</span></span>
+<span class="line"><span>/steward           # surveille une pull request déjà ouverte, sans la relire</span></span></code></pre>
+<p>Sur un dépôt qui n’est pas sur GitHub, <code>/ship</code> n’ouvre pas de pull request, mais relit quand même ton changement.</p>
+<h2 id="lactiver-pour-une-équipe">L’activer pour une équipe</h2>
+<p>Il faut le rôle <strong>Owner</strong> de l’organisation Claude. Tout se passe dans <strong>Organization settings &gt; Claude Ship</strong>.</p>
+<p>La doc conseille d’activer un agent à la fois, sur un seul dépôt, dans cet ordre : Code Review, puis PR Steward, puis Claude Approvals.</p>
+<h3 id="1-code-review">1. Code Review</h3>
+<ol>
+<li>Active l’interrupteur sous <strong>Review</strong>, puis clique <strong>Turn on</strong>.</li>
+<li>Si une fenêtre <strong>Connect GitHub</strong> s’ouvre, clique <strong>Connect</strong> et autorise Claude.</li>
+<li>Si tes dépôts n’apparaissent pas, clique <strong>Install GitHub App</strong> : choisis l’organisation GitHub et les dépôts. Il faut être propriétaire de l’organisation GitHub.</li>
+<li>Sélectionne les dépôts et valide l’ajout.</li>
+<li>Dans « Choose what Claude does on these repositories », laisse <strong>Code review</strong> coché, décoche <strong>Steward</strong> pour l’instant, puis <strong>Turn on</strong>.</li>
+<li>Ouvre une pull request de test, pas en brouillon : une vérification nommée <strong>Claude Code Review</strong> apparaît en quelques minutes.</li>
+</ol>
+<p>Deux réglages par dépôt, avec le bouton <strong>Edit</strong> de sa ligne :</p>
+<table>
+<thead>
+<tr>
+<th>Réglage</th>
+<th>Choix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Review level</td>
+<td>Quick (le plus rapide, le moins cher), Standard (par défaut), Deep (le plus poussé, le plus cher)</td>
+</tr>
+<tr>
+<td>Review runs</td>
+<td>Once after PR creation, After every push (par défaut), Manual (<code>@claude review</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>En manuel, un commentaire <code>@claude review</code> sur la pull request lance la review. Les brouillons et les pull requests venues d’un fork ne sont jamais relus automatiquement.</p>
+<h3 id="2-pr-steward">2. PR Steward</h3>
+<p>Avant de l’activer, la doc demande une règle de branche qui exige une pull request avec au moins une approbation sur la branche par défaut.</p>
+<ol>
+<li>Sous l’interrupteur <strong>Steward</strong>, choisis pour qui il tourne (<strong>Runs for</strong>) : tout le monde, ou une liste de comptes GitHub.</li>
+<li>Clique l’interrupteur <strong>Steward</strong>, puis <strong>Turn on</strong>.</li>
+<li>Fixe une limite mensuelle : <strong>Organization settings &gt; Usage</strong>, section Services, ligne PR Steward.</li>
+<li>Sur la ligne du dépôt, <strong>Edit</strong> : règle Steward sur <strong>Manual (@claude steward)</strong> et fixe un plafond par pull request avec <strong>Steward spend cap</strong>.</li>
+<li>Teste : commente <code>@claude steward</code> sur une pull request. Le label <code>claude-pr-steward-watching</code> et un commentaire « Claude PR Steward » apparaissent.</li>
+</ol>
+<p>Pour l’arrêter sur une pull request, retire ce label.</p>
+<h3 id="3-claude-approvals">3. Claude Approvals</h3>
+<p>Il s’active en ajoutant un fichier <code>.claude/approvals.yml</code> à la racine du dépôt, sur la branche par défaut. Voici le modèle de départ de la doc :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#8A8576;font-style:italic"># .claude/approvals.yml</span></span>
+<span class="line"><span style="color:#F0C674">version</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">1</span></span>
+<span class="line"><span style="color:#F0C674">mode</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">observe</span></span>
+<span class="line"><span style="color:#F0C674">rules</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#E9E4D6">  - </span><span style="color:#F0C674">purpose</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">"A change takes two people. When Claude's review passes, one is enough and Claude approves."</span></span>
+<span class="line"><span style="color:#F0C674">    paths</span><span style="color:#E9E4D6">: [</span><span style="color:#F0C674">"**"</span><span style="color:#E9E4D6">]</span></span>
+<span class="line"><span style="color:#F0C674">    verdict</span><span style="color:#E9E4D6">: { </span><span style="color:#F0C674">claude</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">comments</span><span style="color:#E9E4D6">, </span><span style="color:#F0C674">seats</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">2</span><span style="color:#E9E4D6"> }</span></span>
+<span class="line"><span style="color:#F0C674">    override</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#E9E4D6">      - { </span><span style="color:#F0C674">if</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">"claude/code_review = pass"</span><span style="color:#E9E4D6">, </span><span style="color:#F0C674">verdict</span><span style="color:#E9E4D6">: { </span><span style="color:#F0C674">claude</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">approves</span><span style="color:#E9E4D6">, </span><span style="color:#F0C674">seats</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">1</span><span style="color:#E9E4D6"> } }</span></span>
+<span class="line"><span style="color:#E9E4D6">  - </span><span style="color:#F0C674">purpose</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">"A change to the review rules takes two people."</span></span>
+<span class="line"><span style="color:#F0C674">    paths</span><span style="color:#E9E4D6">: [</span><span style="color:#F0C674">"**/.claude/**"</span><span style="color:#E9E4D6">]</span></span>
+<span class="line"><span style="color:#F0C674">    nested</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">inherit</span></span>
+<span class="line"><span style="color:#F0C674">    verdict</span><span style="color:#E9E4D6">: { </span><span style="color:#F0C674">claude</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">comments</span><span style="color:#E9E4D6">, </span><span style="color:#F0C674">seats</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">2</span><span style="color:#E9E4D6"> }</span></span></code></pre>
+<p>Ce que dit ce fichier : un changement demande deux personnes. Si la review de Claude passe, une seule suffit et Claude approuve. Un changement des règles elles-mêmes demande toujours deux personnes.</p>
+<p><strong>Commence en <code>mode: observe</code>.</strong> La vérification montre ce que les règles auraient décidé, sans que Claude approuve quoi que ce soit.</p>
+<ol>
+<li>Ajoute le fichier dans sa propre pull request.</li>
+<li>Merge quand Claude commente que le fichier est valide.</li>
+<li>Ouvre une autre pull request : une vérification <strong>Claude Approvals</strong> apparaît, avec un titre qui commence par « (observe mode) ».</li>
+</ol>
+<p>Pour passer en vrai :</p>
+<ol>
+<li>Supprime la ligne <code>mode: observe</code> et merge. Sans cette ligne, les règles s’appliquent.</li>
+<li>Cinq minutes plus tard, commente <code>@claude approvals rerun</code> sur les pull requests encore ouvertes.</li>
+<li>Dans les règles de branche GitHub, rends la vérification <strong>Claude Approvals</strong> obligatoire.</li>
+</ol>
+<h2 id="ce-que-ça-coûte">Ce que ça coûte</h2>
+<ul>
+<li>Chaque agent est facturé <strong>aux tokens</strong>, sur les crédits d’usage de l’organisation, <strong>en plus</strong> de l’abonnement.</li>
+<li><code>/ship</code> et <code>/steward</code> comptent dans ton usage normal de Claude Code.</li>
+<li>Claude Approvals n’a pas de coût de base, mais des règles qui s’appuient sur la review de Claude déclenchent une Code Review facturée, <strong>même en mode observe</strong>.</li>
+<li>La doc ne donne pas de prix : tout dépend de la taille des pull requests et du niveau de review.</li>
+</ul>
+<h2 id="les-pièges">Les pièges</h2>
+<ul>
+<li><strong>PR Steward n’a aucune limite de dépense tant que tu n’en mets pas.</strong> Et la dépense peut dépasser le plafond avant qu’il s’arrête.</li>
+<li><strong>Auto-merge.</strong> Avec l’auto-merge ou une file de merge GitHub, des règles qui n’exigent pas l’approbation d’une personne laissent un changement partir sans que personne n’agisse.</li>
+<li><strong>Ajouter un dépôt peut lancer Code Review dessus</strong>, et c’est facturé.</li>
+<li><strong>Couper les crédits d’usage n’arrête pas un agent</strong> : s’il est activé, il continue de tourner et de facturer.</li>
+<li><strong>Windows natif</strong> : <code>/ship</code> ne lance pas de surveillance.</li>
+<li><strong>Les sessions cloud</strong> n’ont ni <code>/ship</code> ni <code>/steward</code>.</li>
+<li><strong>La surveillance de <code>/ship</code></strong> : ne la lance que là où tu fais confiance à tous ceux qui peuvent pousser sur ta branche ou merger sur la branche de base. La doc prévient qu’ils peuvent faire tourner des programmes sur ta machine, avec tes accès.</li>
+<li><strong>Pour tout arrêter</strong>, dans cet ordre : Approvals, puis PR Steward, puis Code Review.</li>
+</ul>
+<p>Et l’avertissement d’Anthropic, à garder en tête : Claude Ship peut rater des bugs et des failles de sécurité.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://claude.com/resources/articles/introducing-claude-ship">Annonce de Claude Ship</a></li>
+<li><a href="https://code.claude.com/docs/en/claude-ship">Vue d’ensemble</a></li>
+<li><a href="https://code.claude.com/docs/en/ship-command">Les commandes /ship et /steward</a></li>
+<li><a href="https://code.claude.com/docs/en/code-review-setup">Activer Code Review</a></li>
+<li><a href="https://code.claude.com/docs/en/pr-steward-setup">Activer PR Steward</a></li>
+<li><a href="https://code.claude.com/docs/en/approvals-setup">Activer Claude Approvals</a></li>
+</ul>
+</div></article></main><footer class="foot"><span>© 2026 vie de dev · fait avec Astro, zéro JS</span><ul aria-label="Réseaux"><li><a href="https://www.tiktok.com/@viededev" rel="me">TikTok</a></li><li><a href="https://www.instagram.com/viede.dev/" rel="me">Instagram</a></li><li><a href="https://www.youtube.com/@viededev" rel="me">YouTube</a></li><li><a href="/rss.xml">rss</a></li></ul></footer></div></body></html>
