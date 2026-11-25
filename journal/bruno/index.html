@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Bruno : remplacer Postman par un dossier dans ton dépôt – Vie de Dev</title><meta name="description" content="Bruno est un client API open source qui range tes requêtes dans un dossier de fichiers texte. Comment l'installer, importer tes collections Postman, les versionner avec Git et les lancer en CI."><link rel="canonical" href="https://viede.dev/journal/bruno/"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#F5F2EA" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#13120E" media="(prefers-color-scheme: dark)"><meta property="og:title" content="Bruno : remplacer Postman par un dossier dans ton dépôt – Vie de Dev"><meta property="og:description" content="Bruno est un client API open source qui range tes requêtes dans un dossier de fichiers texte. Comment l'installer, importer tes collections Postman, les versionner avec Git et les lancer en CI."><meta property="og:url" content="https://viede.dev/journal/bruno/"><meta property="og:type" content="article"><meta property="og:site_name" content="Vie de Dev"><meta property="og:locale" content="fr_FR"><meta property="article:published_time" content="2026-11-25T00:00:00.000Z"><meta property="og:image" content="https://viede.dev/og/bruno.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Image de partage : Bruno : remplacer Postman par un dossier dans ton dépôt"><meta name="twitter:card" content="summary_large_image"><link rel="alternate" type="application/rss+xml" title="Vie de Dev" href="/rss.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/_astro/Base.xOoV3n0S.css"></head><body><a class="skip" href="#contenu">Aller au contenu</a><div class="site"><header class="nav"><a class="logo" href="/" aria-label="vie de dev, accueil">vie de dev<span class="cur" aria-hidden="true"></span></a><nav aria-label="Navigation principale"><ul><li><a href="/journal/" aria-current="page">journal</a></li><li><a href="/apps/">apps</a></li><li><a href="/a-propos/">à propos</a></li></ul></nav></header><main id="contenu"><article class="page"><nav class="crumbs" aria-label="Fil d'ariane"><a href="/journal/">journal</a> / api / outils / git / open-source</nav><h1>Bruno : remplacer Postman par un dossier dans ton dépôt</h1><p class="meta"><span class="hash">660609b</span><time datetime="2026-11-25">25 nov. 2026</time><span>5 min de lecture</span><span>#api #outils #git #open-source</span></p><div class="prose"><p>Bruno est un client API open source, sous licence MIT. Tes requêtes ne partent pas dans un cloud : elles vivent dans un dossier de fichiers texte, que tu ranges dans ton dépôt à côté du code.</p>
+<p><strong>D’où vient ce guide.</strong> Il suit la documentation officielle et le README de Bruno, lus le 25/11/2026 (version 4.4.0, 48,6 k étoiles sur GitHub). Les noms de menus sont ceux de la doc, en anglais.</p>
+<h2 id="ce-que-ça-change-par-rapport-à-postman">Ce que ça change par rapport à Postman</h2>
+<ul>
+<li><strong>Une collection est un dossier.</strong> Un fichier par requête, lisible dans n’importe quel éditeur.</li>
+<li><strong>Elle se versionne avec Git.</strong> Une requête modifiée apparaît dans le diff de la pull request, comme le reste du code.</li>
+<li><strong>Pas de synchro cloud.</strong> Le README est clair : Bruno fonctionne hors ligne, et aucune synchro cloud n’est prévue, « jamais ».</li>
+</ul>
+<h2 id="linstaller">L’installer</h2>
+<p>Le binaire se télécharge sur <a href="https://www.usebruno.com/downloads">usebruno.com/downloads</a> pour Mac, Windows et Linux. Ou avec un gestionnaire de paquets :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#E9E4D6">brew </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> bruno</span><span style="color:#8A8576;font-style:italic">              # macOS</span></span>
+<span class="line"><span style="color:#E9E4D6">winget </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> Bruno.Bruno</span><span style="color:#8A8576;font-style:italic">      # Windows</span></span>
+<span class="line"><span style="color:#E9E4D6">choco </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> bruno</span><span style="color:#8A8576;font-style:italic">             # Windows</span></span>
+<span class="line"><span style="color:#E9E4D6">snap </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> bruno</span><span style="color:#8A8576;font-style:italic">              # Linux</span></span>
+<span class="line"><span style="color:#E9E4D6">flatpak </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> com.usebruno.Bruno</span></span></code></pre>
+<h2 id="importer-une-collection-postman">Importer une collection Postman</h2>
+<p>Dans Postman :</p>
+<ol>
+<li>Clique sur la collection, puis <strong>Export</strong>.</li>
+<li>Choisis <strong>Collection v2</strong> ou <strong>Collection v2.1</strong>, puis <strong>Export</strong>.</li>
+<li>Enregistre le fichier <code>.json</code>.</li>
+</ol>
+<p>Dans Bruno :</p>
+<ol>
+<li>Clique sur <strong>+</strong> en haut à gauche, puis <strong>Import Collection</strong>.</li>
+<li>Glisse le fichier <code>.json</code>, ou clique pour le choisir.</li>
+<li>Clique <strong>Import</strong>.</li>
+</ol>
+<p>Pour un environnement : dans Postman, menu <strong>…</strong> à côté de l’environnement, puis <strong>Export</strong>. Dans Bruno, icône <strong>Environments</strong> en haut à droite, <strong>Configure environments</strong>, puis <strong>Import environment</strong>.</p>
+<p>Trois choses à savoir :</p>
+<ul>
+<li><strong>Les scripts sont traduits.</strong> À l’import, Bruno convertit les appels courants (<code>pm.test</code>, <code>pm.environment</code>, <code>pm.globals</code>, <code>pm.collectionVariables</code>, <code>pm.response</code>). Pour les garder tels quels, il y a l’option <strong>Preserve scripts</strong>, dans <strong>Options &gt; Show Advanced Options</strong>.</li>
+<li><strong>Les paquets npm de Postman ne passent pas.</strong> Un script qui utilise <code>postman-collection</code>, <code>newman</code> ou <code>@postman/*</code> est à réécrire.</li>
+<li><strong>L’import en masse est payant.</strong> Importer d’un coup l’export complet de Postman (toutes les collections et tous les environnements) est réservé à l’édition Ultimate. Collection par collection, c’est gratuit.</li>
+</ul>
+<h2 id="à-quoi-ressemble-le-dossier">À quoi ressemble le dossier</h2>
+<p>Depuis Bruno 3.0.0, les requêtes s’écrivent en YAML. C’est le format que la doc recommande pour les nouvelles collections. L’ancien format <code>.bru</code> reste pris en charge.</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>ma-collection/</span></span>
+<span class="line"><span>├── opencollection.yml</span></span>
+<span class="line"><span>├── environments/</span></span>
+<span class="line"><span>│   └── development.yml</span></span>
+<span class="line"><span>├── users/</span></span>
+<span class="line"><span>│   ├── folder.yml</span></span>
+<span class="line"><span>│   ├── create-user.yml</span></span>
+<span class="line"><span>│   ├── get-user.yml</span></span>
+<span class="line"><span>│   └── delete-user.yml</span></span>
+<span class="line"><span>└── orders/</span></span>
+<span class="line"><span>    └── create-order.yml</span></span></code></pre>
+<p>Le début d’un fichier de requête, tiré de l’exemple de la doc :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#F0C674">info</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">  name</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">Create User</span></span>
+<span class="line"><span style="color:#F0C674">  type</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">http</span></span>
+<span class="line"><span style="color:#F0C674">  seq</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F0C674">http</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">  method</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">POST</span></span>
+<span class="line"><span style="color:#F0C674">  url</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">https://api.example.com/users</span></span>
+<span class="line"><span style="color:#F0C674">  body</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">    type</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">json</span></span></code></pre>
+<p>L’exemple complet ajoute le contenu du corps et un script de tests qui vérifie le statut 201.</p>
+<p>Une collection au format <code>.bru</code> a la même forme, avec <code>bruno.json</code> à la racine et un fichier <code>.bru</code> par requête.</p>
+<h2 id="la-versionner-avec-git">La versionner avec Git</h2>
+<p>La collection est un dossier : place-la dans ton dépôt et pousse-la comme le reste.</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#E9E4D6">git </span><span style="color:#F0C674">add</span><span style="color:#F0C674"> api/</span></span>
+<span class="line"><span style="color:#E9E4D6">git </span><span style="color:#F0C674">commit</span><span style="color:#F0C674"> -m</span><span style="color:#F0C674"> "requêtes API"</span></span>
+<span class="line"><span style="color:#E9E4D6">git </span><span style="color:#F0C674">push</span></span></code></pre>
+<p><strong>Le piège.</strong> Bruno a aussi une interface Git intégrée, et elle n’est pas entièrement gratuite :</p>
+<table>
+<thead>
+<tr>
+<th>Dans l’interface de Bruno</th>
+<th>Édition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>init, voir les diffs, vérifier les mises à jour, pull, clone</td>
+<td>gratuite</td>
+</tr>
+<tr>
+<td>commit, push, branches, résolution des conflits</td>
+<td>Pro ou Ultimate</td>
+</tr>
+</tbody>
+</table>
+<p>Tu n’en as pas besoin. La doc présente deux façons de collaborer : l’interface de Bruno, ou les commandes Git dans le terminal. La seconde ne coûte rien.</p>
+<h2 id="les-secrets">Les secrets</h2>
+<p>Une collection versionnée ne doit contenir aucun secret. Bruno propose deux moyens.</p>
+<p><strong>Les variables secrètes.</strong> Coche une variable d’environnement comme secrète : sa valeur est stockée sur ta machine, chiffrée, et le fichier d’environnement ne garde que son nom. Elle n’est pas exportée avec la collection et s’affiche <code>****</code> dans les rapports.</p>
+<p><strong>Un fichier <code>.env</code></strong>, à la racine du dossier de collection :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>JWT_TOKEN=your_jwt_token_value</span></span>
+<span class="line"><span>API_KEY=your_api_key_value</span></span></code></pre>
+<p>Dans une requête ou un environnement, tu l’appelles avec <code>{{process.env.JWT_TOKEN}}</code>.</p>
+<ul>
+<li>Ajoute <code>.env</code> à ton <code>.gitignore</code>. La doc insiste.</li>
+<li>Versionne à la place un <code>.env.sample</code> sans les vraies valeurs, pour que tes collègues sachent quoi remplir.</li>
+<li>Une valeur qui contient un <code>#</code> se met entre guillemets doubles.</li>
+</ul>
+<h2 id="lancer-les-requêtes-sans-linterface">Lancer les requêtes sans l’interface</h2>
+<p>La ligne de commande s’installe avec npm (Node 18 ou plus récent) :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#E9E4D6">npm </span><span style="color:#F0C674">install</span><span style="color:#F0C674"> -g</span><span style="color:#F0C674"> @usebruno/cli</span></span></code></pre>
+<p>Depuis le dossier de la collection (celui qui contient <code>opencollection.yml</code> ou <code>bruno.json</code>) :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#E9E4D6">bru </span><span style="color:#F0C674">run</span><span style="color:#8A8576;font-style:italic">                       # toute la collection</span></span>
+<span class="line"><span style="color:#E9E4D6">bru </span><span style="color:#F0C674">run</span><span style="color:#F0C674"> users</span><span style="color:#F0C674"> --env</span><span style="color:#F0C674"> Local</span><span style="color:#8A8576;font-style:italic">     # un dossier, avec un environnement</span></span>
+<span class="line"><span style="color:#E9E4D6">bru </span><span style="color:#F0C674">run</span><span style="color:#F0C674"> -r</span><span style="color:#8A8576;font-style:italic">                    # en parcourant les sous-dossiers</span></span></code></pre>
+<p>Les options utiles :</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--env</code></td>
+<td>choisit l’environnement</td>
+</tr>
+<tr>
+<td><code>--env-var apiKey=valeur</code></td>
+<td>passe une variable, par exemple un secret</td>
+</tr>
+<tr>
+<td><code>--bail</code></td>
+<td>s’arrête au premier échec</td>
+</tr>
+<tr>
+<td><code>--reporter-junit results.xml</code></td>
+<td>écrit un rapport JUnit (aussi <code>--reporter-json</code>, <code>--reporter-html</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="en-ci">En CI</h2>
+<p>Bruno fournit une action GitHub. L’exemple minimal de la doc, à placer dans <code>.github/workflows/</code> :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#F0C674">name</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">API Tests</span></span>
+<span class="line"><span style="color:#FF8A65">on</span><span style="color:#E9E4D6">: [</span><span style="color:#F0C674">pull_request</span><span style="color:#E9E4D6">, </span><span style="color:#F0C674">push</span><span style="color:#E9E4D6">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F0C674">jobs</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">  bruno</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">    runs-on</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">ubuntu-latest</span></span>
+<span class="line"><span style="color:#F0C674">    steps</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#E9E4D6">      - </span><span style="color:#F0C674">uses</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">actions/checkout@v6</span></span>
+<span class="line"><span style="color:#E9E4D6">      - </span><span style="color:#F0C674">uses</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">usebruno/bruno-cli-action@v1</span></span>
+<span class="line"><span style="color:#F0C674">        with</span><span style="color:#E9E4D6">:</span></span>
+<span class="line"><span style="color:#F0C674">          working-directory</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">tests/payments</span></span>
+<span class="line"><span style="color:#F0C674">          command</span><span style="color:#E9E4D6">: </span><span style="color:#F0C674">'run --env prod'</span></span></code></pre>
+<p>Ailleurs que sur GitHub, il y a l’image Docker <code>usebruno/cli</code>, ou la commande directe :</p>
+<pre class="astro-code commit" style="background-color:#1C1B16;color:#E9E4D6; overflow-x: auto;" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#E9E4D6">bru </span><span style="color:#F0C674">run</span><span style="color:#F0C674"> --env</span><span style="color:#F0C674"> ci</span><span style="color:#F0C674"> --reporter-junit</span><span style="color:#F0C674"> results.xml</span></span></code></pre>
+<h2 id="ce-qui-est-gratuit-ce-qui-est-payant">Ce qui est gratuit, ce qui est payant</h2>
+<table>
+<thead>
+<tr>
+<th>Édition</th>
+<th>Prix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open Source</td>
+<td>0 $</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>6 $ par utilisateur et par mois</td>
+</tr>
+<tr>
+<td>Ultimate</td>
+<td>11 $ par utilisateur et par mois</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>18 $ par utilisateur et par mois</td>
+</tr>
+</tbody>
+</table>
+<p>Les prix payants sont ceux d’une facturation annuelle.</p>
+<p>Tout ce que décrit ce guide tient dans l’édition gratuite : le client, l’import d’une collection, les fichiers dans ton dépôt, la ligne de commande, la CI. Ce que tu paies, c’est du confort : les boutons commit et push dans l’interface, l’import en masse depuis Postman.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://github.com/usebruno/bruno">Dépôt GitHub de Bruno</a></li>
+<li><a href="https://docs.usebruno.com/get-started/import-export-data/postman-migration">Migrer depuis Postman</a></li>
+<li><a href="https://docs.usebruno.com/get-started/import-export-data/import-collections">Importer une collection</a></li>
+<li><a href="https://docs.usebruno.com/opencollection-yaml/overview">Format YAML OpenCollection</a></li>
+<li><a href="https://docs.usebruno.com/secrets-management/secret-variables">Variables secrètes</a> et <a href="https://docs.usebruno.com/secrets-management/dotenv-file">fichier .env</a></li>
+<li><a href="https://docs.usebruno.com/bru-cli/run/overview">Ligne de commande</a> et <a href="https://docs.usebruno.com/bru-cli/github-actions/overview">GitHub Actions</a></li>
+<li><a href="https://docs.usebruno.com/git-integration/overview">Git dans Bruno</a></li>
+<li><a href="https://www.usebruno.com/pricing">Tarifs</a></li>
+</ul>
+</div><aside class="video" aria-labelledby="video"><h2 id="video">Aussi en vidéo</h2><ul><li><a class="btn ghost" href="https://www.instagram.com/reel/DgKg_rftnCS/">Instagram</a></li></ul></aside></article></main><footer class="foot"><span>© 2026 vie de dev · fait avec Astro, zéro JS</span><ul aria-label="Réseaux"><li><a href="https://www.tiktok.com/@viededev" rel="me">TikTok</a></li><li><a href="https://www.instagram.com/viede.dev/" rel="me">Instagram</a></li><li><a href="https://www.youtube.com/@viededev" rel="me">YouTube</a></li><li><a href="/rss.xml">rss</a></li></ul></footer></div></body></html>
